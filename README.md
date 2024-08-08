@@ -1,16 +1,12 @@
-# Requests [![GoDoc](https://godoc.org/github.com/carlmjohnson/requests?status.svg)](https://godoc.org/github.com/carlmjohnson/requests) [![Go Report Card](https://goreportcard.com/badge/github.com/carlmjohnson/requests)](https://goreportcard.com/report/github.com/carlmjohnson/requests) [![Coverage Status](https://coveralls.io/repos/github/earthboundkid/requests/badge.svg)](https://coveralls.io/github/earthboundkid/requests) [![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
+# restclient [![Go Report Card](https://goreportcard.com/badge/github.com/raeperd/restclient)](https://goreportcard.com/report/github.com/raeperd/restclient) [![Coverage Status](https://coveralls.io/repos/github/raeperd/restclient/badge.svg?branch=main)](https://coveralls.io/github/raeperd/restclient?branch=main)  
 
-![Requests logo](https://github.com/earthboundkid/requests/assets/222245/e59a9f82-c6c7-46d8-96b2-ce2f7dd58dce)
-
-## _HTTP requests for Gophers._
+## _REST client for Gophers._
 
 **The problem**: Go's net/http is powerful and versatile, but using it correctly for client requests can be extremely verbose.
 
-**The solution**: The requests.Builder type is a convenient way to build, send, and handle HTTP requests. Builder has a fluent API with methods returning a pointer to the same struct, which allows for declaratively describing a request by method chaining.
+**The solution**: The restclient.Builder type is a convenient way to build, send, and handle HTTP requests. Builder has a fluent API with methods returning a pointer to the same struct, which allows for declaratively describing a request by method chaining.
 
-Requests also comes with tools for building custom http transports, include a request recorder and replayer for testing.
-
-*[See this note on the canonical project URL.](https://gist.github.com/earthboundkid/8915002ae0e531cecdfc58bc6453ac80)*
+restclient also comes with tools for building custom http transports, include a request recorder and replayer for testing.
 
 ## Features
 
@@ -32,7 +28,7 @@ Requests also comes with tools for building custom http transports, include a re
 <thead>
 <tr>
 <th><strong>code with net/http</strong></th>
-<th><strong>code with requests</strong></th>
+<th><strong>code with restclient</strong></th>
 </tr>
 </thead>
 <tbody>
@@ -61,7 +57,7 @@ s := string(b)
 
 ```go
 var s string
-err := requests.
+err := restclient.
 	URL("http://example.com").
 	ToString(&s).
 	Fetch(ctx)
@@ -80,7 +76,7 @@ err := requests.
 <thead>
 <tr>
 <th><strong>code with net/http</strong></th>
-<th><strong>code with requests</strong></th>
+<th><strong>code with restclient</strong></th>
 </tr>
 </thead>
 <tbody>
@@ -110,7 +106,7 @@ if err != nil {
 <td>
 
 ```go
-err := requests.
+err := restclient.
 	URL("https://postman-echo.com/post").
 	BodyBytes([]byte(`hello, world`)).
 	ContentType("text/plain").
@@ -127,7 +123,7 @@ err := requests.
 <thead>
 <tr>
 <th><strong>code with net/http</strong></th>
-<th><strong>code with requests</strong></th>
+<th><strong>code with restclient</strong></th>
 </tr>
 </thead>
 <tbody>
@@ -164,7 +160,7 @@ if err != nil {
 
 ```go
 var post placeholder
-err := requests.
+err := restclient.
 	URL("https://jsonplaceholder.typicode.com").
 	Pathf("/posts/%d", 1).
 	ToJSON(&post).
@@ -184,7 +180,7 @@ req := placeholder{
 	Body:   "baz",
 	UserID: 1,
 }
-err := requests.
+err := restclient.
 	URL("/posts").
 	Host("jsonplaceholder.typicode.com").
 	BodyJSON(&req).
@@ -198,7 +194,7 @@ err := requests.
 ```go
 // Set headers
 var headers postman
-err := requests.
+err := restclient.
 	URL("https://postman-echo.com/get").
 	UserAgent("bond/james-bond").
 	ContentType("secret").
@@ -209,7 +205,7 @@ err := requests.
 ### Easily manipulate URLs and query parameters
 
 ```go
-u, err := requests.
+u, err := restclient.
 	URL("https://prod.example.com/get?a=1&b=2").
 	Hostf("%s.example.com", "dev1").
 	Param("b", "3").
@@ -224,15 +220,15 @@ fmt.Println(u.String()) // https://dev1.example.com/get?a=1&b=3&c=4
 ```go
 // record a request to the file system
 var s1, s2 string
-err := requests.URL("http://example.com").
-	Transport(requests.Record(nil, "somedir")).
+err := restclient.URL("http://example.com").
+	Transport(restclient.Record(nil, "somedir")).
 	ToString(&s1).
 	Fetch(ctx)
 check(err)
 
 // now replay the request in tests
-err = requests.URL("http://example.com").
-	Transport(requests.Replay("somedir")).
+err = restclient.URL("http://example.com").
+	Transport(restclient.Replay("somedir")).
 	ToString(&s2).
 	Fetch(ctx)
 check(err)
@@ -252,17 +248,17 @@ Brad Fitzpatrick, long time maintainer of the net/http package, [wrote an extens
 > - Context support is oddly bolted on
 > - Proper usage is too many lines of boilerplate
 
-Requests solves these issues by always closing the response body, checking status codes by default, always requiring a `context.Context`, and simplifying the boilerplate with a descriptive UI based on fluent method chaining.
+restclient solves these issues by always closing the response body, checking status codes by default, always requiring a `context.Context`, and simplifying the boilerplate with a descriptive UI based on fluent method chaining.
 
-### Why requests and not some other helper library?
+### Why restclient and not some other helper library?
 
-There are two major flaws in other libraries as I see it. One is that in other libraries support for `context.Context` tends to be bolted on if it exists at all. Two, many hide the underlying `http.Client` in such a way that it is difficult or impossible to replace or mock out. Beyond that, I believe that none have achieved the same core simplicity that the requests library has.
+There are two major flaws in other libraries as I see it. One is that in other libraries support for `context.Context` tends to be bolted on if it exists at all. Two, many hide the underlying `http.Client` in such a way that it is difficult or impossible to replace or mock out. Beyond that, I believe that none have achieved the same core simplicity that the restclient library has.
 
 ### How do I just get some JSON?
 
 ```go
 var data SomeDataType
-err := requests.
+err := restclient.
 	URL("https://example.com/my-json").
 	ToJSON(&data).
 	Fetch(ctx)
@@ -273,7 +269,7 @@ err := requests.
 ```go
 body := MyRequestType{}
 var resp MyResponseType
-err := requests.
+err := restclient.
 	URL("https://example.com/my-json").
 	BodyJSON(&body).
 	ToJSON(&resp).
@@ -285,7 +281,7 @@ err := requests.
 It depends on exactly what you need in terms of file atomicity and buffering, but this will work for most cases:
 
 ```go
-err := requests.
+err := restclient.
 	URL("http://example.com").
 	ToFile("myfile.txt").
 	Fetch(ctx)
@@ -297,7 +293,7 @@ For more advanced use case, use `ToWriter`.
 
 ```go
 var s string
-err := requests.
+err := restclient.
 	URL("http://example.com").
 	ToString(&s).
 	Fetch(ctx)
@@ -305,10 +301,10 @@ err := requests.
 
 ### How do I validate the response status?
 
-By default, if no other validators are added to a builder, requests will check that the response is in the 2XX range. If you add another validator, you can add `builder.CheckStatus(200)` or `builder.AddValidator(requests.DefaultValidator)` to the validation stack.
+By default, if no other validators are added to a builder, restclient will check that the response is in the 2XX range. If you add another validator, you can add `builder.CheckStatus(200)` or `builder.AddValidator(restclient.DefaultValidator)` to the validation stack.
 
 To disable all response validation, run `builder.AddValidator(nil)`.
 
 ## Contributing
 
-Please [create a discussion](https://github.com/earthboundkid/requests/discussions) before submitting a pull request for a new feature.
+Please [create a discussion](https://github.com/raeperd/restclient/discussions) before submitting a pull request for a new feature.
