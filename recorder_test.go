@@ -1,4 +1,4 @@
-package requests_test
+package restclient_test
 
 import (
 	"context"
@@ -8,22 +8,22 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/carlmjohnson/requests"
-	"github.com/carlmjohnson/requests/internal/be"
+	"github.com/raeperd/restclient"
+	"github.com/raeperd/restclient/internal/be"
 )
 
 func TestRecordReplay(t *testing.T) {
 	dir := t.TempDir()
 
 	var s1, s2 string
-	err := requests.URL("http://example.com").
-		Transport(requests.Record(http.DefaultTransport, dir)).
+	err := restclient.URL("http://example.com").
+		Transport(restclient.Record(http.DefaultTransport, dir)).
 		ToString(&s1).
 		Fetch(context.Background())
 	be.NilErr(t, err)
 
-	err = requests.URL("http://example.com").
-		Transport(requests.Replay(dir)).
+	err = restclient.URL("http://example.com").
+		Transport(restclient.Replay(dir)).
 		ToString(&s2).
 		Fetch(context.Background())
 	be.NilErr(t, err)
@@ -34,7 +34,7 @@ func TestCaching(t *testing.T) {
 	dir := t.TempDir()
 	hasRun := false
 	content := "some content"
-	var onceTrans requests.RoundTripFunc = func(req *http.Request) (res *http.Response, err error) {
+	var onceTrans restclient.RoundTripFunc = func(req *http.Request) (res *http.Response, err error) {
 		be.False(t, hasRun)
 		hasRun = true
 		res = &http.Response{
@@ -43,14 +43,14 @@ func TestCaching(t *testing.T) {
 		}
 		return
 	}
-	trans := requests.Caching(onceTrans, dir)
+	trans := restclient.Caching(onceTrans, dir)
 	var s1, s2 string
-	err := requests.URL("http://example.com").
+	err := restclient.URL("http://example.com").
 		Transport(trans).
 		ToString(&s1).
 		Fetch(context.Background())
 	be.NilErr(t, err)
-	err = requests.URL("http://example.com").
+	err = restclient.URL("http://example.com").
 		Transport(trans).
 		ToString(&s2).
 		Fetch(context.Background())

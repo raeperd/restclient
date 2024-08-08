@@ -1,4 +1,4 @@
-package requests_test
+package restclient_test
 
 import (
 	"bytes"
@@ -16,17 +16,17 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/carlmjohnson/requests"
+	"github.com/raeperd/restclient"
 )
 
 func init() {
-	http.DefaultClient.Transport = requests.Replay("testdata")
+	http.DefaultClient.Transport = restclient.Replay("testdata")
 }
 
 func Example() {
 	// Simple GET into a string
 	var s string
-	err := requests.
+	err := restclient.
 		URL("http://example.com").
 		ToString(&s).
 		Fetch(context.Background())
@@ -42,7 +42,7 @@ func Example_getJSON() {
 	// GET a JSON object
 	id := 1
 	var post placeholder
-	err := requests.
+	err := restclient.
 		URL("https://jsonplaceholder.typicode.com").
 		Pathf("/posts/%d", id).
 		ToJSON(&post).
@@ -63,7 +63,7 @@ func Example_postJSON() {
 		Body:   "baz",
 		UserID: 1,
 	}
-	err := requests.
+	err := restclient.
 		URL("/posts").
 		Host("jsonplaceholder.typicode.com").
 		BodyJSON(&req).
@@ -80,7 +80,7 @@ func Example_postJSON() {
 func ExampleBuilder_ToBytesBuffer() {
 	// Simple GET into a buffer
 	var buf bytes.Buffer
-	err := requests.
+	err := restclient.
 		URL("http://example.com").
 		ToBytesBuffer(&buf).
 		Fetch(context.Background())
@@ -100,7 +100,7 @@ func ExampleBuilder_ToWriter() {
 	defer os.Remove(f.Name()) // clean up
 
 	// suppose there is some io.Writer you want to stream to
-	err = requests.
+	err = restclient.
 		URL("http://example.com").
 		ToWriter(f).
 		Fetch(context.Background())
@@ -129,7 +129,7 @@ func ExampleBuilder_ToFile() {
 
 	exampleFilename := filepath.Join(dir, "example.txt")
 
-	err = requests.
+	err = restclient.
 		URL("http://example.com").
 		ToFile(exampleFilename).
 		Fetch(context.Background())
@@ -157,7 +157,7 @@ type placeholder struct {
 func ExampleBuilder_Path() {
 	// Add an ID to a base URL path
 	id := 1
-	u, err := requests.
+	u, err := restclient.
 		URL("https://api.example.com/posts/").
 		// inherits path /posts from base URL
 		Pathf("%d", id).
@@ -171,7 +171,7 @@ func ExampleBuilder_Path() {
 }
 func ExampleBuilder_CheckStatus() {
 	// Expect a specific status code
-	err := requests.
+	err := restclient.
 		URL("https://jsonplaceholder.typicode.com").
 		Pathf("/posts/%d", 9001).
 		CheckStatus(404).
@@ -188,13 +188,13 @@ func ExampleBuilder_CheckStatus() {
 
 func ExampleBuilder_CheckContentType() {
 	// Expect a specific status code
-	err := requests.
+	err := restclient.
 		URL("https://jsonplaceholder.typicode.com").
 		Pathf("/posts/%d", 1).
 		CheckContentType("application/bison").
 		Fetch(context.Background())
 	if err != nil {
-		if re := new(requests.ResponseError); errors.As(err, &re) {
+		if re := new(restclient.ResponseError); errors.As(err, &re) {
 			fmt.Println("content-type was", re.Header.Get("Content-Type"))
 		}
 	}
@@ -214,7 +214,7 @@ func Example_queryParam() {
 	subdomain := "dev1"
 	c := 4
 
-	u, err := requests.
+	u, err := restclient.
 		URL("https://prod.example.com/get?a=1&b=2").
 		Hostf("%s.example.com", subdomain).
 		Param("b", "3").
@@ -239,7 +239,7 @@ func ExampleBuilder_Params() {
 	}
 
 	// Then add them to the URL
-	u, err := requests.
+	u, err := restclient.
 		URL("https://www.example.com/get?a=0&z=6").
 		Params(values).
 		URL()
@@ -255,7 +255,7 @@ func ExampleBuilder_Params() {
 func ExampleBuilder_Header() {
 	// Set headers
 	var headers postman
-	err := requests.
+	err := restclient.
 		URL("https://postman-echo.com/get").
 		UserAgent("bond/james-bond").
 		BasicAuth("bondj", "007!").
@@ -287,7 +287,7 @@ func ExampleBuilder_Headers() {
 		h.Add("x-trace-id", "abc123")
 	}
 	// Then add them to a request
-	req, err := requests.
+	req, err := restclient.
 		URL("https://example.com").
 		Headers(h).
 		Request(context.Background())
@@ -301,7 +301,7 @@ func ExampleBuilder_Headers() {
 }
 func ExampleBuilder_Bearer() {
 	// We get a 401 response if no bearer token is provided
-	err := requests.
+	err := restclient.
 		URL("http://httpbin.org/bearer").
 		CheckStatus(http.StatusUnauthorized).
 		Fetch(context.Background())
@@ -313,7 +313,7 @@ func ExampleBuilder_Bearer() {
 		Authenticated bool
 		Token         string
 	}
-	err = requests.
+	err = restclient.
 		URL("http://httpbin.org/bearer").
 		Bearer("whatever").
 		ToJSON(&res).
@@ -331,7 +331,7 @@ func ExampleBuilder_Bearer() {
 func ExampleBuilder_BodyBytes() {
 	// Post a raw body
 	var data postman
-	err := requests.
+	err := restclient.
 		URL("https://postman-echo.com/post").
 		BodyBytes([]byte(`hello, world`)).
 		ContentType("text/plain").
@@ -368,7 +368,7 @@ func ExampleBuilder_BodyReader() {
 
 	// send the raw file to server
 	var echo postman
-	err = requests.
+	err = restclient.
 		URL("https://postman-echo.com/post").
 		ContentType("text/plain").
 		BodyReader(f).
@@ -386,7 +386,7 @@ func ExampleBuilder_CopyHeaders() {
 	// Get headers while also getting body
 	var s string
 	headers := http.Header{}
-	err := requests.
+	err := restclient.
 		URL("http://example.com").
 		CopyHeaders(headers).
 		// CopyHeaders disables status validation, so add it back
@@ -406,7 +406,7 @@ func ExampleBuilder_CopyHeaders() {
 func ExampleBuilder_ToHeaders() {
 	// Send a HEAD request and look at headers
 	headers := http.Header{}
-	err := requests.
+	err := restclient.
 		URL("http://example.com").
 		ToHeaders(headers).
 		Fetch(context.Background())
@@ -420,7 +420,7 @@ func ExampleBuilder_ToHeaders() {
 
 func ExampleBuilder_BodyWriter() {
 	var echo postman
-	err := requests.
+	err := restclient.
 		URL("https://postman-echo.com/post").
 		ContentType("text/plain").
 		BodyWriter(func(w io.Writer) error {
@@ -443,7 +443,7 @@ func ExampleBuilder_BodyWriter() {
 func ExampleBuilder_BodyForm() {
 	// Submit form values
 	var echo postman
-	err := requests.
+	err := restclient.
 		URL("https://postman-echo.com/put").
 		Put().
 		BodyForm(url.Values{
@@ -475,7 +475,7 @@ func ExampleBuilder_BodyFile() {
 
 	// Post a raw file
 	var data postman
-	err = requests.
+	err = restclient.
 		URL("https://postman-echo.com/post").
 		BodyFile(exampleFilename).
 		ContentType("text/plain").
@@ -493,7 +493,7 @@ func ExampleBuilder_CheckPeek() {
 	// Check that a response has a doctype
 	const doctype = "<!doctype html>"
 	var s string
-	err := requests.
+	err := restclient.
 		URL("http://example.com").
 		CheckPeek(len(doctype), func(b []byte) error {
 			if string(b) != doctype {
@@ -518,7 +518,7 @@ func ExampleBuilder_CheckPeek() {
 
 func ExampleBuilder_Transport() {
 	const text = "Hello, from transport!"
-	var myCustomTransport requests.RoundTripFunc = func(req *http.Request) (res *http.Response, err error) {
+	var myCustomTransport restclient.RoundTripFunc = func(req *http.Request) (res *http.Response, err error) {
 		res = &http.Response{
 			StatusCode: http.StatusOK,
 			Body:       io.NopCloser(strings.NewReader(text)),
@@ -526,7 +526,7 @@ func ExampleBuilder_Transport() {
 		return
 	}
 	var s string
-	err := requests.
+	err := restclient.
 		URL("x://transport.example").
 		Transport(myCustomTransport).
 		ToString(&s).
@@ -541,13 +541,13 @@ func ExampleBuilder_Transport() {
 
 func ExampleBuilder_ErrorJSON() {
 	{
-		trans := requests.ReplayString(`HTTP/1.1 200 OK
+		trans := restclient.ReplayString(`HTTP/1.1 200 OK
 
 	{"x": 1}`)
 
 		var goodJSON struct{ X int }
 		var errJSON struct{ Error string }
-		err := requests.
+		err := restclient.
 			URL("http://example.com/").
 			Transport(trans).
 			ToJSON(&goodJSON).
@@ -560,20 +560,20 @@ func ExampleBuilder_ErrorJSON() {
 		}
 	}
 	{
-		trans := requests.ReplayString(`HTTP/1.1 418 I'm a teapot
+		trans := restclient.ReplayString(`HTTP/1.1 418 I'm a teapot
 
 	{"error": "brewing"}`)
 
 		var goodJSON struct{ X int }
 		var errJSON struct{ Error string }
-		err := requests.
+		err := restclient.
 			URL("http://example.com/").
 			Transport(trans).
 			ToJSON(&goodJSON).
 			ErrorJSON(&errJSON).
 			Fetch(context.Background())
 		switch {
-		case errors.Is(err, requests.ErrInvalidHandled):
+		case errors.Is(err, restclient.ErrInvalidHandled):
 			fmt.Println(errJSON.Error)
 		case err != nil:
 			fmt.Println("Error!", err)
@@ -602,7 +602,7 @@ func ExampleBuilder_BodySerializer() {
 		return buf.Bytes(), err
 	}
 	// Make a request using the serializer
-	req, err := requests.
+	req, err := restclient.
 		New().
 		BodySerializer(serializer, data).
 		Request(context.Background())
@@ -620,7 +620,7 @@ func ExampleBuilder_BodySerializer() {
 }
 
 func ExampleBuilder_ToDeserializer() {
-	trans := requests.ReplayString(
+	trans := restclient.ReplayString(
 		"HTTP/1.1 200 OK\r\n\r\nXYZ\x00\xde\xca\xff",
 	)
 	// Have some binary structure
@@ -634,7 +634,7 @@ func ExampleBuilder_ToDeserializer() {
 		return binary.Read(buf, binary.BigEndian, v)
 	}
 	// Make a request using the deserializer
-	err := requests.
+	err := restclient.
 		New().
 		Transport(trans).
 		ToDeserializer(deserializer, &data).
@@ -651,9 +651,9 @@ func ExampleBuilder_ToDeserializer() {
 
 func ExampleBuilder_BodyJSON() {
 	// Restore defaults after this test
-	defaultSerializer := requests.JSONSerializer
+	defaultSerializer := restclient.JSONSerializer
 	defer func() {
-		requests.JSONSerializer = defaultSerializer
+		restclient.JSONSerializer = defaultSerializer
 	}()
 
 	data := struct {
@@ -665,7 +665,7 @@ func ExampleBuilder_BodyJSON() {
 	}
 
 	// Build a request using the default JSON serializer
-	req, err := requests.
+	req, err := restclient.
 		New().
 		BodyJSON(&data).
 		Request(context.Background())
@@ -678,12 +678,12 @@ func ExampleBuilder_BodyJSON() {
 	fmt.Println()
 
 	// Change the default JSON serializer to indent with two spaces
-	requests.JSONSerializer = func(v any) ([]byte, error) {
+	restclient.JSONSerializer = func(v any) ([]byte, error) {
 		return json.MarshalIndent(v, "", "  ")
 	}
 
 	// Build a new request using the new indenting serializer
-	req, err = requests.
+	req, err = restclient.
 		New().
 		BodyJSON(&data).
 		Request(context.Background())
@@ -712,7 +712,7 @@ func ExampleBuilder_ParamOptional() {
 	yes := "1"
 	no := ""
 
-	u, err := requests.
+	u, err := restclient.
 		URL("https://www.example.com/?c=something").
 		ParamOptional("a", yes).
 		ParamOptional("b", no).  // Won't set ?b= because no is blank
@@ -735,7 +735,7 @@ func ExampleBuilder_HeaderOptional() {
 		"BAR": "",
 		"BAZ": "",
 	}
-	req, err := requests.
+	req, err := restclient.
 		URL("https://example.com").
 		HeaderOptional("X-FOO", env["FOO"]).
 		HeaderOptional("X-BAR", env["BAR"]). // Won't set because BAR is blank

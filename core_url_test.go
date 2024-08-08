@@ -1,9 +1,9 @@
-package requests
+package restclient
 
 import (
 	"testing"
 
-	"github.com/carlmjohnson/requests/internal/be"
+	"github.com/raeperd/restclient/internal/be"
 )
 
 // PathCases is exported to share tests with requests_test

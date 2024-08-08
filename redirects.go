@@ -1,4 +1,4 @@
-package requests
+package restclient
 
 import "net/http"
 

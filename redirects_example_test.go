@@ -1,18 +1,18 @@
-package requests_test
+package restclient_test
 
 import (
 	"context"
 	"fmt"
 	"net/http"
 
-	"github.com/carlmjohnson/requests"
+	"github.com/raeperd/restclient"
 )
 
 func ExampleCheckRedirectPolicy() {
 	cl := *http.DefaultClient
-	cl.CheckRedirect = requests.NoFollow
+	cl.CheckRedirect = restclient.NoFollow
 
-	if err := requests.
+	if err := restclient.
 		URL("https://httpbingo.org/redirect/1").
 		Client(&cl).
 		CheckStatus(http.StatusFound).
@@ -33,9 +33,9 @@ func ExampleCheckRedirectPolicy() {
 
 func ExampleMaxFollow() {
 	cl := *http.DefaultClient
-	cl.CheckRedirect = requests.MaxFollow(1)
+	cl.CheckRedirect = restclient.MaxFollow(1)
 
-	if err := requests.
+	if err := restclient.
 		URL("https://httpbingo.org/redirect/2").
 		Client(&cl).
 		CheckStatus(http.StatusFound).

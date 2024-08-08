@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/carlmjohnson/requests"
-	"github.com/carlmjohnson/requests/reqxml"
+	"github.com/raeperd/restclient"
+	"github.com/raeperd/restclient/reqxml"
 )
 
 func init() {
-	http.DefaultClient.Transport = requests.Replay("testdata")
+	http.DefaultClient.Transport = restclient.Replay("testdata")
 	// http.DefaultClient.Transport = requests.Caching(nil, "testdata")
 }
 
@@ -26,7 +26,7 @@ func ExampleTo() {
 		CDs []CD `xml:"CD"`
 	}
 	var cat Catalog
-	err := requests.
+	err := restclient.
 		URL("https://www.w3schools.com/xml/cd_catalog.xml").
 		Handle(reqxml.To(&cat)).
 		Fetch(context.Background())

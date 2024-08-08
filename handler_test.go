@@ -1,4 +1,4 @@
-package requests_test
+package restclient_test
 
 import (
 	"context"
@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/carlmjohnson/requests"
-	"github.com/carlmjohnson/requests/internal/be"
+	"github.com/raeperd/restclient"
+	"github.com/raeperd/restclient/internal/be"
 )
 
 func BenchmarkBuilder_ToFile(b *testing.B) {
@@ -25,7 +25,7 @@ func BenchmarkBuilder_ToFile(b *testing.B) {
 	}
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
-		err = requests.URL("http://speedtest-nyc1.digitalocean.com/10mb.test").
+		err = restclient.URL("http://speedtest-nyc1.digitalocean.com/10mb.test").
 			Client(&http.Client{Transport: http.DefaultTransport}).
 			ToFile(tmpFiles[n]).
 			Fetch(context.Background())

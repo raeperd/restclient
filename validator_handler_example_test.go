@@ -1,4 +1,4 @@
-package requests_test
+package restclient_test
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/carlmjohnson/requests"
+	"github.com/raeperd/restclient"
 )
 
 func ExampleValidatorHandler() {
@@ -18,17 +18,17 @@ func ExampleValidatorHandler() {
 	// If we fail validation because the response is a 404,
 	// we handle the body with errBody instead of regularBody
 	// for separate processing.
-	err := requests.
+	err := restclient.
 		URL("http://example.com/404").
 		ToString(&regularBody).
 		AddValidator(
-			requests.ValidatorHandler(
-				requests.DefaultValidator,
-				requests.ToString(&errBody),
+			restclient.ValidatorHandler(
+				restclient.DefaultValidator,
+				restclient.ToString(&errBody),
 			)).
 		Fetch(context.Background())
 	switch {
-	case errors.Is(err, requests.ErrInvalidHandled):
+	case errors.Is(err, restclient.ErrInvalidHandled):
 		fmt.Println("got errBody:",
 			strings.Contains(errBody, "Example Domain"))
 	case err != nil:

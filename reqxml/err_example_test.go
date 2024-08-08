@@ -6,8 +6,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/carlmjohnson/requests"
-	"github.com/carlmjohnson/requests/reqxml"
+	"github.com/raeperd/restclient"
+	"github.com/raeperd/restclient/reqxml"
 )
 
 func ExampleError() {
@@ -20,12 +20,12 @@ func ExampleError() {
 	}
 
 	var errObj ErrorXML
-	err := requests.
+	err := restclient.
 		URL("http://example.s3.us-east-1.amazonaws.com").
 		AddValidator(reqxml.Error(&errObj)).
 		Fetch(context.Background())
 	switch {
-	case errors.Is(err, requests.ErrInvalidHandled):
+	case errors.Is(err, restclient.ErrInvalidHandled):
 		fmt.Println(errObj.Message)
 	case err != nil:
 		fmt.Println("Error!", err)

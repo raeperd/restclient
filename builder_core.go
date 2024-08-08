@@ -1,4 +1,4 @@
-package requests
+package restclient
 
 import (
 	"cmp"
@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/carlmjohnson/requests/internal/minitrue"
-	"github.com/carlmjohnson/requests/internal/slicex"
+	"github.com/raeperd/restclient/internal/minitrue"
+	"github.com/raeperd/restclient/internal/slicex"
 )
 
 // Builder is a convenient way to build, send, and handle HTTP requests.

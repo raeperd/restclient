@@ -1,4 +1,4 @@
-package requests_test
+package restclient_test
 
 import (
 	"compress/gzip"
@@ -8,13 +8,13 @@ import (
 	"net/http/httptest"
 	"strings"
 
-	"github.com/carlmjohnson/requests"
+	"github.com/raeperd/restclient"
 )
 
 func ExampleNew() {
 	// Suppose all requests in your project need some common options set.
 	// First, define a Config function in your project...
-	myProjectConfig := func(rb *requests.Builder) {
+	myProjectConfig := func(rb *restclient.Builder) {
 		rb.
 			BaseURL("http://example.com").
 			UserAgent("myproj/1.0").
@@ -23,7 +23,7 @@ func ExampleNew() {
 
 	// Then build your requests using that Config as the base Builder.
 	var s string
-	err := requests.
+	err := restclient.
 		New(myProjectConfig).
 		Path("/").
 		Param("some_param", "some-value").
@@ -39,10 +39,10 @@ func ExampleNew() {
 
 func ExampleGzipConfig() {
 	var echo postman
-	err := requests.
+	err := restclient.
 		URL("https://postman-echo.com/post").
 		ContentType("text/plain").
-		Config(requests.GzipConfig(
+		Config(restclient.GzipConfig(
 			gzip.DefaultCompression,
 			func(gw *gzip.Writer) error {
 				_, err := gw.Write([]byte(`hello, world`))
@@ -74,8 +74,8 @@ func ExampleTestServerConfig() {
 	// Now test that the handler has the expected return values
 	{
 		var s string
-		err := requests.
-			New(requests.TestServerConfig(srv)).
+		err := restclient.
+			New(restclient.TestServerConfig(srv)).
 			Path("/greeting").
 			ToString(&s).
 			Fetch(context.Background())
@@ -86,8 +86,8 @@ func ExampleTestServerConfig() {
 	}
 	{
 		var s string
-		err := requests.
-			New(requests.TestServerConfig(srv)).
+		err := restclient.
+			New(restclient.TestServerConfig(srv)).
 			Path("/salutation").
 			ToString(&s).
 			Fetch(context.Background())

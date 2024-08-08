@@ -1,4 +1,4 @@
-package requests_test
+package restclient_test
 
 import (
 	"bytes"
@@ -7,14 +7,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/carlmjohnson/requests"
-	"github.com/carlmjohnson/requests/internal/be"
+	"github.com/raeperd/restclient"
+	"github.com/raeperd/restclient/internal/be"
 )
 
 func TestClone(t *testing.T) {
 	t.Parallel()
 	t.Run("from URL", func(t *testing.T) {
-		rb1 := requests.
+		rb1 := restclient.
 			URL("http://example.com").
 			Path("a/").
 			Header("a", "1").
@@ -69,7 +69,7 @@ func TestClone(t *testing.T) {
 		be.Equal(t, "6", req3.URL.Query().Get("c"))
 	})
 	t.Run("from new", func(t *testing.T) {
-		rb1 := new(requests.Builder).
+		rb1 := new(restclient.Builder).
 			Host("example.com").
 			Header("a", "1").
 			Header("b", "2").
@@ -119,7 +119,7 @@ func TestClone(t *testing.T) {
 }
 
 func TestScheme(t *testing.T) {
-	u, err := requests.
+	u, err := restclient.
 		URL("example").
 		Scheme("string").
 		URL()
@@ -131,9 +131,9 @@ func TestScheme(t *testing.T) {
 
 func TestPath(t *testing.T) {
 	t.Parallel()
-	for name, tc := range requests.PathCases {
+	for name, tc := range restclient.PathCases {
 		t.Run(name, func(t *testing.T) {
-			var b requests.Builder
+			var b restclient.Builder
 			b.BaseURL(tc.Base)
 			for _, p := range tc.Paths {
 				b.Path(p)
@@ -148,13 +148,13 @@ func TestPath(t *testing.T) {
 func TestContentLength(t *testing.T) {
 	t.Parallel()
 	for _, n := range []int{0, 1, 10, 1000, 100_000} {
-		req, err := requests.
+		req, err := restclient.
 			URL("http://example.com").
 			BodyBytes(bytes.Repeat([]byte("a"), n)).
 			Request(context.Background())
 		be.NilErr(t, err)
 		be.Equal(t, int64(n), req.ContentLength)
-		req, err = requests.
+		req, err = restclient.
 			URL("http://example.com").
 			BodyReader(
 				strings.NewReader(strings.Repeat("a", n)),
@@ -164,7 +164,7 @@ func TestContentLength(t *testing.T) {
 		be.Equal(t, int64(n), req.ContentLength)
 	}
 	for _, obj := range []any{nil, 1, "x"} {
-		req, err := requests.
+		req, err := restclient.
 			URL("http://example.com").
 			BodyJSON(obj).
 			Request(context.Background())
@@ -174,7 +174,7 @@ func TestContentLength(t *testing.T) {
 	for _, qs := range []string{"", "a", "a=1"} {
 		q, err := url.ParseQuery(qs)
 		be.NilErr(t, err)
-		req, err := requests.
+		req, err := restclient.
 			URL("http://example.com").
 			BodyForm(q).
 			Request(context.Background())

@@ -1,4 +1,4 @@
-package requests_test
+package restclient_test
 
 import (
 	"bytes"
@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/carlmjohnson/requests"
+	"github.com/raeperd/restclient"
 )
 
 func ExampleReplayString() {
@@ -21,9 +21,9 @@ An example response.`
 
 	var s string
 	const expected = `An example response.`
-	if err := requests.
+	if err := restclient.
 		URL("http://response.example").
-		Transport(requests.ReplayString(res)).
+		Transport(restclient.ReplayString(res)).
 		ToString(&s).
 		Fetch(context.Background()); err != nil {
 		panic(err)
@@ -36,9 +36,9 @@ An example response.`
 func ExamplePermitURLTransport() {
 	// Wrap an existing transport or use nil for http.DefaultTransport
 	baseTrans := http.DefaultClient.Transport
-	trans := requests.PermitURLTransport(baseTrans, `^http://example\.com/`)
+	trans := restclient.PermitURLTransport(baseTrans, `^http://example\.com/`)
 	var s string
-	if err := requests.
+	if err := restclient.
 		URL("http://example.com/").
 		Transport(trans).
 		ToString(&s).
@@ -47,7 +47,7 @@ func ExamplePermitURLTransport() {
 	}
 	fmt.Println(strings.Contains(s, "Example Domain"))
 
-	if err := requests.
+	if err := restclient.
 		URL("http://unauthorized.example.com/").
 		Transport(trans).
 		ToString(&s).
@@ -62,7 +62,7 @@ func ExamplePermitURLTransport() {
 func ExampleRoundTripFunc() {
 	// Wrap an underlying transport in order to add request middleware
 	baseTrans := http.DefaultClient.Transport
-	var checksumTransport requests.RoundTripFunc = func(req *http.Request) (res *http.Response, err error) {
+	var checksumTransport restclient.RoundTripFunc = func(req *http.Request) (res *http.Response, err error) {
 		// Read and checksum the body
 		b, err := io.ReadAll(req.Body)
 		if err != nil {
@@ -80,7 +80,7 @@ func ExampleRoundTripFunc() {
 		return baseTrans.RoundTrip(&req2)
 	}
 	var data postman
-	err := requests.
+	err := restclient.
 		URL("https://postman-echo.com/post").
 		BodyBytes([]byte(`Hello, World!`)).
 		ContentType("text/plain").
@@ -102,9 +102,9 @@ func ExampleLogTransport() {
 	}
 	// Wrap an existing transport or use nil for http.DefaultTransport
 	baseTrans := http.DefaultClient.Transport
-	trans := requests.LogTransport(baseTrans, logger)
+	trans := restclient.LogTransport(baseTrans, logger)
 	var s string
-	if err := requests.
+	if err := restclient.
 		URL("http://example.com/").
 		Transport(trans).
 		ToString(&s).
@@ -112,11 +112,11 @@ func ExampleLogTransport() {
 		fmt.Println("Error!", err)
 	}
 	// Works for bad responses too
-	baseTrans = requests.ErrorTransport(errors.New("can't connect"))
+	baseTrans = restclient.ErrorTransport(errors.New("can't connect"))
 
-	trans = requests.LogTransport(baseTrans, logger)
+	trans = restclient.LogTransport(baseTrans, logger)
 
-	if err := requests.
+	if err := restclient.
 		URL("http://example.com/").
 		Transport(trans).
 		ToString(&s).

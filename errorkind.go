@@ -1,4 +1,4 @@
-package requests
+package restclient
 
 // ErrorKind indicates where an error was returned in the process of building, validating, and handling a request.
 // Errors returned by Builder can be tested for their ErrorKind using errors.Is or errors.As.

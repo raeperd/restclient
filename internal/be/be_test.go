@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/carlmjohnson/requests/internal/be"
+	"github.com/raeperd/restclient/internal/be"
 )
 
 type testingTB struct {

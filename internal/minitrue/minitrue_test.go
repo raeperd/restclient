@@ -3,8 +3,8 @@ package minitrue_test
 import (
 	"testing"
 
-	"github.com/carlmjohnson/requests/internal/be"
-	"github.com/carlmjohnson/requests/internal/minitrue"
+	"github.com/raeperd/restclient/internal/be"
+	"github.com/raeperd/restclient/internal/minitrue"
 )
 
 func TestCond(t *testing.T) {

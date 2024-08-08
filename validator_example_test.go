@@ -1,18 +1,18 @@
-package requests_test
+package restclient_test
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/carlmjohnson/requests"
+	"github.com/raeperd/restclient"
 )
 
 func ExampleHasStatusErr() {
-	err := requests.
+	err := restclient.
 		URL("http://example.com/404").
 		CheckStatus(200).
 		Fetch(context.Background())
-	if requests.HasStatusErr(err, 404) {
+	if restclient.HasStatusErr(err, 404) {
 		fmt.Println("got a 404")
 	}
 	// Output:

@@ -1,10 +1,10 @@
-package requests
+package restclient
 
 import (
 	"cmp"
 	"net/url"
 
-	"github.com/carlmjohnson/requests/internal/slicex"
+	"github.com/raeperd/restclient/internal/slicex"
 )
 
 type multimap struct {

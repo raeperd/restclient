@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/carlmjohnson/requests/internal/be"
+	"github.com/raeperd/restclient/internal/be"
 )
 
 type mockDebug struct {

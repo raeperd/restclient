@@ -1,4 +1,4 @@
-package requests_test
+package restclient_test
 
 import (
 	"context"
@@ -6,15 +6,15 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/carlmjohnson/requests"
+	"github.com/raeperd/restclient"
 )
 
 func ExampleNewCookieJar() {
 	// Create a client that preserve cookies between requests
 	myClient := *http.DefaultClient
-	myClient.Jar = requests.NewCookieJar()
+	myClient.Jar = restclient.NewCookieJar()
 	// Use the client to make a request
-	err := requests.
+	err := restclient.
 		URL("http://httpbin.org/cookies/set/chocolate/chip").
 		Client(&myClient).
 		Fetch(context.Background())
@@ -32,7 +32,7 @@ func ExampleNewCookieJar() {
 	var cookies struct {
 		Cookies map[string]string
 	}
-	err = requests.
+	err = restclient.
 		URL("http://httpbin.org/cookies").
 		Client(&myClient).
 		ToJSON(&cookies).
@@ -44,7 +44,7 @@ func ExampleNewCookieJar() {
 
 	// And we can manually add our own cookie values
 	// without overriding existing ones
-	err = requests.
+	err = restclient.
 		URL("http://httpbin.org/cookies").
 		Client(&myClient).
 		Cookie("oatmeal", "raisin").

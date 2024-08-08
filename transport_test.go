@@ -1,21 +1,21 @@
-package requests_test
+package restclient_test
 
 import (
 	"context"
 	"net/http"
 	"testing"
 
-	"github.com/carlmjohnson/requests"
-	"github.com/carlmjohnson/requests/internal/be"
+	"github.com/raeperd/restclient"
+	"github.com/raeperd/restclient/internal/be"
 )
 
 func TestUserAgentTransport(t *testing.T) {
 	// Wrap an existing transport or use nil for http.DefaultTransport
 	baseTrans := http.DefaultClient.Transport
-	trans := requests.UserAgentTransport(baseTrans, "my-user/agent")
+	trans := restclient.UserAgentTransport(baseTrans, "my-user/agent")
 
 	var headers postman
-	err := requests.
+	err := restclient.
 		URL("https://postman-echo.com/get").
 		Transport(trans).
 		ToJSON(&headers).

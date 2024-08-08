@@ -1,4 +1,4 @@
-package requests_test
+package restclient_test
 
 import (
 	"bufio"
@@ -8,7 +8,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/carlmjohnson/requests"
+	"github.com/raeperd/restclient"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -16,9 +16,9 @@ import (
 func ExampleToBufioReader() {
 	// read a response line by line for a sentinel
 	found := false
-	err := requests.
+	err := restclient.
 		URL("http://example.com").
-		Handle(requests.ToBufioReader(func(r *bufio.Reader) error {
+		Handle(restclient.ToBufioReader(func(r *bufio.Reader) error {
 			var err error
 			for s := ""; err == nil; {
 				if strings.Contains(s, "Example Domain") {
@@ -46,9 +46,9 @@ func ExampleToBufioScanner() {
 	// read a response line by line for a sentinel
 	found := false
 	needle := []byte("Example Domain")
-	err := requests.
+	err := restclient.
 		URL("http://example.com").
-		Handle(requests.ToBufioScanner(func(s *bufio.Scanner) error {
+		Handle(restclient.ToBufioScanner(func(s *bufio.Scanner) error {
 			// read one line at time from response
 			for s.Scan() {
 				if bytes.Contains(s.Bytes(), needle) {
@@ -69,9 +69,9 @@ func ExampleToBufioScanner() {
 
 func ExampleToHTML() {
 	var doc html.Node
-	err := requests.
+	err := restclient.
 		URL("http://example.com").
-		Handle(requests.ToHTML(&doc)).
+		Handle(restclient.ToHTML(&doc)).
 		Fetch(context.Background())
 	if err != nil {
 		fmt.Println("could not connect to example.com:", err)

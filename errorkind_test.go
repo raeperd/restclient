@@ -1,4 +1,4 @@
-package requests_test
+package restclient_test
 
 import (
 	"context"
@@ -6,68 +6,68 @@ import (
 	"io"
 	"testing"
 
-	"github.com/carlmjohnson/requests"
-	"github.com/carlmjohnson/requests/internal/be"
+	"github.com/raeperd/restclient"
+	"github.com/raeperd/restclient/internal/be"
 )
 
 func TestErrorKind(t *testing.T) {
 	t.Parallel()
-	var none requests.ErrorKind = -1
-	kinds := []requests.ErrorKind{
-		requests.ErrURL,
-		requests.ErrRequest,
-		requests.ErrTransport,
-		requests.ErrValidator,
-		requests.ErrHandler,
+	var none restclient.ErrorKind = -1
+	kinds := []restclient.ErrorKind{
+		restclient.ErrURL,
+		restclient.ErrRequest,
+		restclient.ErrTransport,
+		restclient.ErrValidator,
+		restclient.ErrHandler,
 	}
 	ctx := context.Background()
-	res200 := requests.ReplayString("HTTP/1.1 200 OK\n\n")
+	res200 := restclient.ReplayString("HTTP/1.1 200 OK\n\n")
 	for _, tc := range []struct {
 		ctx  context.Context
-		want requests.ErrorKind
-		b    *requests.Builder
+		want restclient.ErrorKind
+		b    *restclient.Builder
 	}{
-		{ctx, none, requests.
+		{ctx, none, restclient.
 			URL("").
 			Transport(res200),
 		},
-		{ctx, requests.ErrURL, requests.
+		{ctx, restclient.ErrURL, restclient.
 			URL("http://%2020").
 			Transport(res200),
 		},
-		{ctx, requests.ErrURL, requests.
+		{ctx, restclient.ErrURL, restclient.
 			URL("hello world").
 			Transport(res200),
 		},
-		{ctx, none, requests.
+		{ctx, none, restclient.
 			URL("http://world/#hello").
 			Transport(res200),
 		},
-		{ctx, requests.ErrRequest, requests.
+		{ctx, restclient.ErrRequest, restclient.
 			URL("").
 			Body(func() (io.ReadCloser, error) {
 				return nil, errors.New("x")
 			}).
 			Transport(res200),
 		},
-		{ctx, requests.ErrRequest, requests.
+		{ctx, restclient.ErrRequest, restclient.
 			URL("").
 			Method(" ").
 			Transport(res200),
 		},
-		{nil, requests.ErrRequest, requests.
+		{nil, restclient.ErrRequest, restclient.
 			URL("").
 			Transport(res200),
 		},
-		{ctx, requests.ErrTransport, requests.
+		{ctx, restclient.ErrTransport, restclient.
 			URL("").
-			Transport(requests.ReplayString("")),
+			Transport(restclient.ReplayString("")),
 		},
-		{ctx, requests.ErrValidator, requests.
+		{ctx, restclient.ErrValidator, restclient.
 			URL("").
-			Transport(requests.ReplayString("HTTP/1.1 404 Nope\n\n")),
+			Transport(restclient.ReplayString("HTTP/1.1 404 Nope\n\n")),
 		},
-		{ctx, requests.ErrHandler, requests.
+		{ctx, restclient.ErrHandler, restclient.
 			URL("").
 			Transport(res200).
 			ToJSON(nil),

@@ -7,8 +7,8 @@ import (
 	"net/http/httputil"
 	"strings"
 
-	"github.com/carlmjohnson/requests"
-	"github.com/carlmjohnson/requests/reqxml"
+	"github.com/raeperd/restclient"
+	"github.com/raeperd/restclient/reqxml"
 )
 
 func ExampleBody() {
@@ -26,7 +26,7 @@ func ExampleBody() {
 		Comment: "Hello!",
 	}
 
-	req, err := requests.
+	req, err := restclient.
 		URL("http://example.com").
 		// reqxml.BodyConfig sets the content type for us
 		Config(reqxml.BodyConfig(&v)).

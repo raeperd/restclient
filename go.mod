@@ -1,4 +1,4 @@
-module github.com/carlmjohnson/requests
+module github.com/raeperd/restclient
 
 go 1.22
 

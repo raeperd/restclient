@@ -1,11 +1,11 @@
-package requests_test
+package restclient_test
 
 import (
 	"context"
 	"fmt"
 	"testing/fstest"
 
-	"github.com/carlmjohnson/requests"
+	"github.com/raeperd/restclient"
 )
 
 func ExampleReplayFS() {
@@ -20,9 +20,9 @@ An example response.`),
 	}
 	var s string
 	const expected = `An example response.`
-	if err := requests.
+	if err := restclient.
 		URL("http://fsys.example").
-		Transport(requests.ReplayFS(fsys)).
+		Transport(restclient.ReplayFS(fsys)).
 		ToString(&s).
 		Fetch(context.Background()); err != nil {
 		panic(err)
