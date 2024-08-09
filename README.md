@@ -1,4 +1,4 @@
-# restclient [![Go Report Card](https://goreportcard.com/badge/github.com/raeperd/restclient)](https://goreportcard.com/report/github.com/raeperd/restclient) [![Coverage Status](https://coveralls.io/repos/github/raeperd/restclient/badge.svg?branch=main)](https://coveralls.io/github/raeperd/restclient?branch=main)  
+# restclient [![Go Reference](https://pkg.go.dev/badge/github.com/raeperd/restclient.svg)](https://pkg.go.dev/github.com/raeperd/restclient) [![Go Report Card](https://goreportcard.com/badge/github.com/raeperd/restclient)](https://goreportcard.com/report/github.com/raeperd/restclient) [![Coverage Status](https://coveralls.io/repos/github/raeperd/restclient/badge.svg?branch=main)](https://coveralls.io/github/raeperd/restclient?branch=main) 
 
 ## _REST client for Gophers._
 
